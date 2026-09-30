@@ -16,6 +16,7 @@ export const singUp = async (
       httpOnly: true,
       secure: false,
       sameSite: "strict",
+      maxAge: 1000 * 60 * 60 * 24 * 7,
     });
     res.status(201).json(response);
   } catch (error) {
