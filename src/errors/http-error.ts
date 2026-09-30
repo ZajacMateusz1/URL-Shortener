@@ -1,8 +1,19 @@
+type ValidationErrors = {
+  formErrors: string[];
+  fieldErrors: Record<string, string[]>;
+};
+
 class HTTPError extends Error {
   statusCode: number;
-  constructor(statusCode: number, message: string) {
+  details: ValidationErrors | null;
+  constructor(
+    message: string,
+    statusCode: number,
+    details: ValidationErrors | null = null,
+  ) {
     super(message);
     this.statusCode = statusCode;
+    this.details = details;
   }
 }
 

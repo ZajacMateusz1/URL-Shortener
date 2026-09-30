@@ -10,7 +10,7 @@ app.get("/health", (req, res) => {
 });
 
 app.use((req, res, next) => {
-  next(new HttpError(404, "Not Found"));
+  next(new HttpError("Not Found", 404));
 });
 
 app.use(errorHandler);
