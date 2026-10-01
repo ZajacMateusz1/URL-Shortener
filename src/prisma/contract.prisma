@@ -5,6 +5,7 @@ model User {
   email     String   @unique
   username  String
   password  String
+  isVerified Boolean  @default(false)
   links     Link[]
   createdAt TimestamptzString @default(now())
   updatedAt temporal.updatedAtString()
