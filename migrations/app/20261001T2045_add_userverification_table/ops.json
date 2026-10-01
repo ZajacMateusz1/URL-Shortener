@@ -1,0 +1,164 @@
+[
+  {
+    "id": "table.userVerification",
+    "label": "Create table \"userVerification\"",
+    "summary": "Creates table \"userVerification\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "userVerification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"userVerification\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"userVerification\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"userVerification\"",
+        "sql": "CREATE TABLE \"public\".\"userVerification\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"expiresAt\" timestamptz NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"tokenHash\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  \"userId\" int4 NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"userVerification\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"userVerification\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.userVerification.userVerification_tokenHash_key",
+    "label": "Add unique constraint on \"userVerification\" (tokenHash)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "userVerification_tokenHash_key",
+        "table": "userVerification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"userVerification_tokenHash_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "userVerification_tokenHash_key",
+          "public",
+          "\"public\".\"userVerification\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"userVerification_tokenHash_key\"",
+        "sql": "ALTER TABLE \"public\".\"userVerification\" ADD CONSTRAINT \"userVerification_tokenHash_key\" UNIQUE (\"tokenHash\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"userVerification_tokenHash_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "userVerification_tokenHash_key",
+          "public",
+          "\"public\".\"userVerification\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.userVerification.userVerification_userId_idx_a489d58a",
+    "label": "Create index \"userVerification_userId_idx_a489d58a\" on \"userVerification\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "userVerification_userId_idx_a489d58a",
+        "table": "userVerification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"userVerification_userId_idx_a489d58a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"userVerification_userId_idx_a489d58a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"userVerification_userId_idx_a489d58a\"",
+        "sql": "CREATE INDEX \"userVerification_userId_idx_a489d58a\" ON \"public\".\"userVerification\" (\"userId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"userVerification_userId_idx_a489d58a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"userVerification_userId_idx_a489d58a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.userVerification.userVerification_userId_fkey",
+    "label": "Add foreign key \"userVerification_userId_fkey\" on \"userVerification\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "userVerification_userId_fkey",
+        "table": "userVerification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"userVerification_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "userVerification_userId_fkey",
+          "public",
+          "\"public\".\"userVerification\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"userVerification_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"userVerification\"\nADD CONSTRAINT \"userVerification_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"User\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"userVerification_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "userVerification_userId_fkey",
+          "public",
+          "\"public\".\"userVerification\""
+        ]
+      }
+    ]
+  }
+]

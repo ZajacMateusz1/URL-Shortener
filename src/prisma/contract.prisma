@@ -20,3 +20,13 @@ model Link {
   createdAt TimestamptzString @default(now())
   updatedAt temporal.updatedAtString()
 }
+
+model userVerification {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  tokenHash     String   @unique
+  expiresAt TimestamptzString
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+}
