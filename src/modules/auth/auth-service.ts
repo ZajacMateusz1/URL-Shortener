@@ -23,9 +23,9 @@ import {
 } from "./auth-repository.js";
 import { createVerificationToken, createJWTToken } from "./auth-utils.js";
 
-import type { SingUpSchemaType, LoginSchemaType } from "./auth-schema.js";
+import type { SignUpSchemaType, LoginSchemaType } from "./auth-schema.js";
 
-export const singUpService = async (data: SingUpSchemaType) => {
+export const singUpService = async (data: SignUpSchemaType) => {
   const hashedPassword = await argon2.hash(data.password);
   data.password = hashedPassword;
   const { verificationToken, hashedToken } = await createVerificationToken();
@@ -57,7 +57,7 @@ export const verifyEmailService = async (token: string) => {
 
 export const resendVerificationEmailService = async (email: string) => {
   const user = await findUserToResendEmail(email);
-  if (!user) throw new HTTPError("User not found or already verified", 404);
+  if (!user) return;
   const { verificationToken, hashedToken } = await createVerificationToken();
   await db.transaction(async (tx) => {
     await deleteVerificationToken(user.id, tx);
@@ -77,14 +77,13 @@ export const loginService = async (data: LoginSchemaType) => {
 
 export const resetPasswordService = async (email: string) => {
   const user = await getUserByEmail(email);
-  if (!user) throw new HTTPError("User not found", 404);
+  if (!user) return;
   const { verificationToken, hashedToken } = await createVerificationToken();
   await db.transaction(async (tx) => {
     await deletePasswordResetToken(user.id, tx);
     await resetPasswordRepository(user.id, hashedToken, tx);
   });
   await sendResetPasswordEmail(user.email, verificationToken);
-  return verificationToken;
 };
 
 export const changePasswordService = async (

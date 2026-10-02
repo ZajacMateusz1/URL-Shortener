@@ -16,7 +16,7 @@ export const passwordSchema = z.object({
 
 export const loginSchema = emailSchema.extend(passwordSchema.shape);
 
-export const singUpSchema = loginSchema.extend({
+export const signUpSchema = loginSchema.extend({
   username: z
     .string()
     .min(3, "Username must be at least 3 characters")
@@ -26,4 +26,4 @@ export const singUpSchema = loginSchema.extend({
 export type EmailSchemaType = z.infer<typeof emailSchema>;
 export type PasswordSchemaType = z.infer<typeof passwordSchema>;
 export type LoginSchemaType = z.infer<typeof loginSchema>;
-export type SingUpSchemaType = z.infer<typeof singUpSchema>;
+export type SignUpSchemaType = z.infer<typeof signUpSchema>;

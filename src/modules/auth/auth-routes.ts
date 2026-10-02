@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-  singup,
+  signup,
   verifyEmail,
   resendVerificationEmail,
   login,
@@ -10,7 +10,7 @@ import {
 } from "./auth-controller.js";
 import validate from "@/middleware/validate.js";
 import {
-  singUpSchema,
+  signUpSchema,
   emailSchema,
   loginSchema,
   passwordSchema,
@@ -18,7 +18,7 @@ import {
 
 const authRouter = Router();
 
-authRouter.post("/singup", validate(singUpSchema), singup);
+authRouter.post("/signup", validate(signUpSchema), signup);
 authRouter.get("/verify-email/:token", verifyEmail);
 authRouter.post(
   "/verify-email/resend",

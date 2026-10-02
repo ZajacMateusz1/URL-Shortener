@@ -11,19 +11,19 @@ import {
 import HttpError from "@/errors/http-error.js";
 
 import type {
-  SingUpSchemaType,
+  SignUpSchemaType,
   EmailSchemaType,
   LoginSchemaType,
   PasswordSchemaType,
 } from "./auth-schema.js";
 
-export const singup = async (
+export const signup = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const data: SingUpSchemaType = req.body;
+    const data: SignUpSchemaType = req.body;
     const { response, token } = await singUpService(data);
     res.cookie("token", token, {
       httpOnly: true,
@@ -62,7 +62,10 @@ export const resendVerificationEmail = async (
   try {
     const { email }: EmailSchemaType = req.body;
     await resendVerificationEmailService(email);
-    res.json({ message: "Verification email sent successfully" });
+    res.json({
+      message:
+        "If the email exists in our system, a verification link has been sent.",
+    });
   } catch (error) {
     next(error);
   }
@@ -104,10 +107,10 @@ export const resetPassword = async (
 ) => {
   try {
     const { email }: EmailSchemaType = req.body;
-    const result = await resetPasswordService(email);
+    await resetPasswordService(email);
     res.json({
-      message: "Password reset email sent successfully",
-      token: result,
+      message:
+        "If the email exists in our system, a password reset link has been sent.",
     });
   } catch (error) {
     next(error);
