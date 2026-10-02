@@ -1,0 +1,83 @@
+[
+  {
+    "id": "dropIndex.userVerification.userVerification_userId_idx_a489d58a",
+    "label": "Drop index \"userVerification_userId_idx_a489d58a\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "userVerification_userId_idx_a489d58a",
+        "table": "userVerification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"userVerification_userId_idx_a489d58a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"userVerification_userId_idx_a489d58a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop index \"userVerification_userId_idx_a489d58a\"",
+        "sql": "DROP INDEX \"public\".\"userVerification_userId_idx_a489d58a\"",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"userVerification_userId_idx_a489d58a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"userVerification_userId_idx_a489d58a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.userVerification.userVerification_userId_key",
+    "label": "Add unique constraint on \"userVerification\" (userId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "userVerification_userId_key",
+        "table": "userVerification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"userVerification_userId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "userVerification_userId_key",
+          "public",
+          "\"public\".\"userVerification\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"userVerification_userId_key\"",
+        "sql": "ALTER TABLE \"public\".\"userVerification\" ADD CONSTRAINT \"userVerification_userId_key\" UNIQUE (\"userId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"userVerification_userId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "userVerification_userId_key",
+          "public",
+          "\"public\".\"userVerification\""
+        ]
+      }
+    ]
+  }
+]

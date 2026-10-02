@@ -25,9 +25,11 @@ model Link {
 model UserVerification {
   id        Int      @id @default(autoincrement())
   user      User     @relation(fields: [userId], references: [id])
-  userId    Int
-  tokenHash     String   @unique
+  userId    Int @unique
+  tokenHash String @unique
   expiresAt TimestamptzString
   createdAt TimestamptzString @default(now())
   updatedAt temporal.updatedAtString()
+
+  @@map ('userVerification')
 }

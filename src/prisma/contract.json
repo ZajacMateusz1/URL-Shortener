@@ -13,7 +13,7 @@
       "namespace": "public"
     },
     "userVerification": {
-      "model": "userVerification",
+      "model": "UserVerification",
       "namespace": "public"
     }
   },
@@ -216,7 +216,7 @@
               "table": "User"
             }
           },
-          "userVerification": {
+          "UserVerification": {
             "fields": {
               "createdAt": {
                 "nullable": false,
@@ -524,22 +524,18 @@
                   }
                 }
               ],
-              "indexes": [
-                {
-                  "columns": [
-                    "userId"
-                  ],
-                  "name": "userVerification_userId_idx_a489d58a",
-                  "prefix": "userVerification_userId_idx",
-                  "unique": false
-                }
-              ],
+              "indexes": [],
               "primaryKey": {
                 "columns": [
                   "id"
                 ]
               },
               "uniques": [
+                {
+                  "columns": [
+                    "userId"
+                  ]
+                },
                 {
                   "columns": [
                     "tokenHash"
@@ -553,7 +549,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "5aca1629b9146477492ec2a11f8683b8662521ea9c2ee94a45e534b235940cff"
+    "storageHash": "2db41fb9d060d4c393eb1bef3bc3add405904224cf6fdcb8d3bae0df2bf1d3c8"
   },
   "execution": {
     "executionHash": "981d2604f047457be02eff25b98e1c307599dabecb00a8fbb1d9168785643f8f",
