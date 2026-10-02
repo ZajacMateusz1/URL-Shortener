@@ -33,3 +33,13 @@ model UserVerification {
 
   @@map ('userVerification')
 }
+
+model PasswordReset {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int @unique
+  tokenHash String @unique
+  expiresAt TimestamptzString
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+}
