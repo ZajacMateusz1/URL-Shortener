@@ -13,3 +13,19 @@ export const welcomeEmailTemplate = `
 </body>
 </html>
 `;
+
+export const verificationEmailTemplate = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email</title>
+</head>
+<body>
+    <h1>Verify Your Email</h1>
+    <p>Please click the link below to verify your email address:</p>
+    <p><a href="{verificationLink}">Verify your email</a></p>
+</body>
+</html>
+`;

@@ -4,10 +4,17 @@ import jwt from "jsonwebtoken";
 import { env } from "@/config/env.js";
 import { db } from "@/prisma/db.js";
 
-import { sendWelcomeEmail } from "@/modules/email/send-email.js";
+import HTTPError from "@/errors/http-error.js";
+import {
+  sendVerificationEmail,
+  sendWelcomeEmail,
+} from "@/modules/email/send-email.js";
 import {
   signUpRepository,
   createUserVerificationTokenRepository,
+  findUserVerification,
+  updateVerificationStatus,
+  deleteVerificationToken,
 } from "./auth-repository.js";
 
 import type { SingUpSchemaType } from "./auth-schema.js";
@@ -29,8 +36,21 @@ export const singUpService = async (data: SingUpSchemaType) => {
     expiresIn: "7d",
   });
   await sendWelcomeEmail(data.email);
+  await sendVerificationEmail(data.email, verificationToken);
   return {
     response: { ...result, password: undefined },
     token: jwtToken,
   };
+};
+
+export const verifyEmailService = async (token: string) => {
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+  const verificationRecord = await findUserVerification(hashedToken);
+  if (verificationRecord === null) throw new HTTPError("Token not found", 404);
+  if (verificationRecord.expiresAt < new Date().toISOString())
+    throw new HTTPError("Token expired", 400);
+  await db.transaction(async (tx) => {
+    await updateVerificationStatus(verificationRecord.userId, tx);
+    await deleteVerificationToken(verificationRecord.userId, tx);
+  });
 };
