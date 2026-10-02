@@ -14,7 +14,7 @@ app.get("/health", (req, res) => {
 app.use("/api/auth", authRouter);
 
 app.use((req, res, next) => {
-  next(new HttpError("Not Found", 404));
+  next(new HttpError("Endpoint not found", 404));
 });
 
 app.use(errorHandler);

@@ -1,9 +1,16 @@
 import type { Request, Response, NextFunction } from "express";
 
-import { singUpService, verifyEmailService } from "./auth-service.js";
+import {
+  resendVerificationEmailService,
+  singUpService,
+  verifyEmailService,
+} from "./auth-service.js";
 import HttpError from "@/errors/http-error.js";
 
-import type { SingUpSchemaType } from "./auth-schema.js";
+import type {
+  SingUpSchemaType,
+  ResendVerificationEmailSchemaType,
+} from "./auth-schema.js";
 
 export const singUp = async (
   req: Request,
@@ -37,6 +44,20 @@ export const verifyEmail = async (
     }
     await verifyEmailService(token);
     res.json({ message: "Email verified successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const resendVerificationEmail = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { email }: ResendVerificationEmailSchemaType = req.body;
+    await resendVerificationEmailService(email);
+    res.json({ message: "Verification email sent successfully" });
   } catch (error) {
     next(error);
   }

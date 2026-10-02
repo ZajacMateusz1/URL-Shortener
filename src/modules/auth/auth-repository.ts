@@ -14,7 +14,7 @@ export const createUserVerificationTokenRepository = async (
   token: string,
   tx: Tx,
 ) => {
-  const result = await tx.orm.public.userVerification.create({
+  const result = await tx.orm.public.UserVerification.create({
     userId,
     tokenHash: token,
     expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
@@ -23,9 +23,9 @@ export const createUserVerificationTokenRepository = async (
 };
 
 export const findUserVerification = (hashedToken: string) => {
-  return db.orm.public.userVerification
-    .where({ tokenHash: hashedToken })
-    .first();
+  return db.orm.public.UserVerification.where({
+    tokenHash: hashedToken,
+  }).first();
 };
 
 export const updateVerificationStatus = async (userId: number, tx: Tx) => {
@@ -33,5 +33,13 @@ export const updateVerificationStatus = async (userId: number, tx: Tx) => {
 };
 
 export const deleteVerificationToken = async (userId: number, tx: Tx) => {
-  return tx.orm.public.userVerification.where({ userId }).delete();
+  return tx.orm.public.UserVerification.where({ userId }).delete();
+};
+
+export const resendVerificationEmailRepository = async (email: string) => {};
+
+export const findUserToResendEmail = async (email: string) => {
+  return db.orm.public.User.select("id", "email")
+    .where({ email, isVerified: false })
+    .first();
 };

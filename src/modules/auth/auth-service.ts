@@ -1,5 +1,5 @@
 import * as argon2 from "argon2";
-import crypto from "node:crypto";
+import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import { env } from "@/config/env.js";
 import { db } from "@/prisma/db.js";
@@ -15,21 +15,19 @@ import {
   findUserVerification,
   updateVerificationStatus,
   deleteVerificationToken,
+  findUserToResendEmail,
 } from "./auth-repository.js";
+import { createVerificationToken } from "./auth-utils.js";
 
 import type { SingUpSchemaType } from "./auth-schema.js";
 
 export const singUpService = async (data: SingUpSchemaType) => {
   const hashedPassword = await argon2.hash(data.password);
   data.password = hashedPassword;
-  const verificationToken = crypto.randomBytes(32).toString("hex");
+  const { verificationToken, hashedToken } = await createVerificationToken();
   const result = await db.transaction(async (tx) => {
     const user = await signUpRepository(data, tx);
-    await createUserVerificationTokenRepository(
-      user.id,
-      crypto.createHash("sha256").update(verificationToken).digest("hex"),
-      tx,
-    );
+    await createUserVerificationTokenRepository(user.id, hashedToken, tx);
     return user;
   });
   const jwtToken = jwt.sign({ id: result.id }, env.JWT_SECRET, {
@@ -53,4 +51,15 @@ export const verifyEmailService = async (token: string) => {
     await updateVerificationStatus(verificationRecord.userId, tx);
     await deleteVerificationToken(verificationRecord.userId, tx);
   });
+};
+
+export const resendVerificationEmailService = async (email: string) => {
+  const user = await findUserToResendEmail(email);
+  if (!user) throw new HTTPError("User not found or already verified", 404);
+  const { verificationToken, hashedToken } = await createVerificationToken();
+  await db.transaction(async (tx) => {
+    await deleteVerificationToken(user.id, tx);
+    await createUserVerificationTokenRepository(user.id, hashedToken, tx);
+  });
+  await sendVerificationEmail(user.email, verificationToken);
 };
