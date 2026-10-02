@@ -47,7 +47,7 @@ export const verifyEmailService = async (token: string) => {
   const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
   const verificationRecord = await findUserVerification(hashedToken);
   if (verificationRecord === null) throw new HTTPError("Token not found", 404);
-  if (verificationRecord.expiresAt < new Date().toISOString())
+  if (new Date(verificationRecord.expiresAt).getTime() < Date.now())
     throw new HTTPError("Token expired", 400);
   await db.transaction(async (tx) => {
     await updateVerificationStatus(verificationRecord.userId, tx);
@@ -93,7 +93,7 @@ export const changePasswordService = async (
   const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
   const verificationRecord = await findPasswordResetToken(hashedToken);
   if (verificationRecord === null) throw new HTTPError("Token not found", 404);
-  if (verificationRecord.expiresAt < new Date().toISOString())
+  if (new Date(verificationRecord.expiresAt).getTime() < Date.now())
     throw new HTTPError("Token expired", 400);
   const hashedPassword = await argon2.hash(password);
   await db.transaction(async (tx) => {
