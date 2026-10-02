@@ -4,6 +4,7 @@ import {
   verifyEmail,
   resendVerificationEmail,
   login,
+  logout,
 } from "./auth-controller.js";
 import validate from "@/middleware/validate.js";
 import {
@@ -22,5 +23,6 @@ authRouter.post(
   resendVerificationEmail,
 );
 authRouter.post("/login", validate(loginSchema), login);
+authRouter.post("/logout", logout);
 
 export default authRouter;
