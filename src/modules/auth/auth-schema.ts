@@ -15,11 +15,17 @@ export const singUpSchema = z.object({
     .regex(/[^A-Za-z0-9]/, "Password must contain a special character"),
 });
 
+export const loginSchema = z.object({
+  email: z.email("Incorrect email format"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+});
+
 export const resendVerificationEmailSchema = z.object({
   email: z.email("Incorrect email format"),
 });
 
 export type SingUpSchemaType = z.infer<typeof singUpSchema>;
+export type LoginSchemaType = z.infer<typeof loginSchema>;
 export type ResendVerificationEmailSchemaType = z.infer<
   typeof resendVerificationEmailSchema
 >;

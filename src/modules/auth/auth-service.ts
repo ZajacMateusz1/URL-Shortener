@@ -1,7 +1,5 @@
 import * as argon2 from "argon2";
 import crypto from "crypto";
-import jwt from "jsonwebtoken";
-import { env } from "@/config/env.js";
 import { db } from "@/prisma/db.js";
 
 import HTTPError from "@/errors/http-error.js";
@@ -17,9 +15,9 @@ import {
   deleteVerificationToken,
   findUserToResendEmail,
 } from "./auth-repository.js";
-import { createVerificationToken } from "./auth-utils.js";
+import { createVerificationToken, createJWTToken } from "./auth-utils.js";
 
-import type { SingUpSchemaType } from "./auth-schema.js";
+import type { SingUpSchemaType, LoginSchemaType } from "./auth-schema.js";
 
 export const singUpService = async (data: SingUpSchemaType) => {
   const hashedPassword = await argon2.hash(data.password);
@@ -30,9 +28,7 @@ export const singUpService = async (data: SingUpSchemaType) => {
     await createUserVerificationTokenRepository(user.id, hashedToken, tx);
     return user;
   });
-  const jwtToken = jwt.sign({ id: result.id }, env.JWT_SECRET, {
-    expiresIn: "7d",
-  });
+  const jwtToken = createJWTToken(result.id);
   await sendWelcomeEmail(data.email);
   await sendVerificationEmail(data.email, verificationToken);
   return {
@@ -62,4 +58,13 @@ export const resendVerificationEmailService = async (email: string) => {
     await createUserVerificationTokenRepository(user.id, hashedToken, tx);
   });
   await sendVerificationEmail(user.email, verificationToken);
+};
+
+export const loginService = async (data: LoginSchemaType) => {
+  const user = await db.orm.public.User.where({ email: data.email }).first();
+  if (!user) throw new HTTPError("Invalid email or password", 401);
+  const isValidPassword = await argon2.verify(user.password, data.password);
+  if (!isValidPassword) throw new HTTPError("Invalid email or password", 401);
+  const token = createJWTToken(user.id);
+  return { response: { ...user, password: undefined }, token };
 };

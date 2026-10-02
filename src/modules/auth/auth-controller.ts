@@ -4,15 +4,17 @@ import {
   resendVerificationEmailService,
   singUpService,
   verifyEmailService,
+  loginService,
 } from "./auth-service.js";
 import HttpError from "@/errors/http-error.js";
 
 import type {
   SingUpSchemaType,
   ResendVerificationEmailSchemaType,
+  LoginSchemaType,
 } from "./auth-schema.js";
 
-export const singUp = async (
+export const singup = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -58,6 +60,26 @@ export const resendVerificationEmail = async (
     const { email }: ResendVerificationEmailSchemaType = req.body;
     await resendVerificationEmailService(email);
     res.json({ message: "Verification email sent successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const loginData: LoginSchemaType = req.body;
+    const { response, token } = await loginService(loginData);
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    });
+    res.json(response);
   } catch (error) {
     next(error);
   }

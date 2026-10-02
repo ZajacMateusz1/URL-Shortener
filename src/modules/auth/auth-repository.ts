@@ -43,3 +43,7 @@ export const findUserToResendEmail = async (email: string) => {
     .where({ email, isVerified: false })
     .first();
 };
+
+export const loginRepository = async (email: string) => {
+  return db.orm.public.User.where({ email }).first();
+};
