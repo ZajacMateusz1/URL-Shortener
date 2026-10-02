@@ -13,12 +13,14 @@
     "lib": ["esnext"],
     "types": ["node"],
     // and npm install -D @types/node
+    "paths": {
+      "@/*": ["./src/*"]
+    },
 
     // Other Outputs
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
-
     // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,

@@ -1,0 +1,54 @@
+import { Resend } from "resend";
+import { env } from "@/config/env.js";
+import {
+  welcomeEmailTemplate,
+  verificationEmailTemplate,
+  resetPasswordEmailTemplate,
+} from "./email-templates.js";
+
+const resend = new Resend(env.RESEND_API_KEY);
+
+export const sendWelcomeEmail = async (recipient: string) => {
+  try {
+    await resend.emails.send({
+      from: "onboarding@resend.dev",
+      to: recipient,
+      subject: "Welcome to Our Service!",
+      html: welcomeEmailTemplate,
+    });
+  } catch (error) {
+    console.error("Error sending welcome email:", error);
+  }
+};
+
+export const sendVerificationEmail = async (
+  recipient: string,
+  token: string,
+) => {
+  const verificationLink = `${env.BASE_URL}/api/auth/verify-email/${token}`;
+  await resend.emails.send({
+    from: "onboarding@resend.dev",
+    to: recipient,
+    subject: "Verify Your Email",
+    html: verificationEmailTemplate.replace(
+      "{verificationLink}",
+      verificationLink,
+    ),
+  });
+};
+
+export const sendResetPasswordEmail = async (
+  recipient: string,
+  token: string,
+) => {
+  const verificationLink = `${env.BASE_URL}/api/auth/reset-password/${token}`;
+  await resend.emails.send({
+    from: "onboarding@resend.dev",
+    to: recipient,
+    subject: "Reset Your Password",
+    html: resetPasswordEmailTemplate.replace(
+      "{verificationLink}",
+      verificationLink,
+    ),
+  });
+};

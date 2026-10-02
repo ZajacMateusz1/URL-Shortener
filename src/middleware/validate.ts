@@ -12,3 +12,5 @@ const validate = (schema: ZodObject) => {
     }
   };
 };
+
+export default validate;
