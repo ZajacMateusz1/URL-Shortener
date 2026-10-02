@@ -29,3 +29,18 @@ export const verificationEmailTemplate = `
 </body>
 </html>
 `;
+
+export const resetPasswordEmailTemplate = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Your Password</title>
+</head>
+<body>
+    <h1>Reset Your Password</h1>
+    <p>Please click the link below to reset your password:</p>
+    <p><a href="{verificationLink}">Reset your password</a></p>
+</body>
+</html>
+`;

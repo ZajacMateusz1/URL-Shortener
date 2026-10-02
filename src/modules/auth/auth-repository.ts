@@ -44,6 +44,17 @@ export const findUserToResendEmail = async (email: string) => {
     .first();
 };
 
-export const loginRepository = async (email: string) => {
+export const getUserByEmail = async (email: string) => {
   return db.orm.public.User.where({ email }).first();
+};
+
+export const resetPasswordRepository = async (
+  userId: number,
+  hashedToken: string,
+) => {
+  return db.orm.public.PasswordReset.create({
+    userId,
+    tokenHash: hashedToken,
+    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+  });
 };

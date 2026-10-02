@@ -1,11 +1,10 @@
 import { z } from "zod";
 
-export const singUpSchema = z.object({
+export const emailSchema = z.object({
   email: z.email("Incorrect email format"),
-  username: z
-    .string()
-    .min(3, "Username must be at least 3 characters")
-    .max(32, "Username must be at most 32 characters"),
+});
+
+export const loginSchema = emailSchema.extend({
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")
@@ -15,17 +14,13 @@ export const singUpSchema = z.object({
     .regex(/[^A-Za-z0-9]/, "Password must contain a special character"),
 });
 
-export const loginSchema = z.object({
-  email: z.email("Incorrect email format"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+export const singUpSchema = loginSchema.extend({
+  username: z
+    .string()
+    .min(3, "Username must be at least 3 characters")
+    .max(32, "Username must be at most 32 characters"),
 });
 
-export const resendVerificationEmailSchema = z.object({
-  email: z.email("Incorrect email format"),
-});
-
-export type SingUpSchemaType = z.infer<typeof singUpSchema>;
+export type EmailSchemaType = z.infer<typeof emailSchema>;
 export type LoginSchemaType = z.infer<typeof loginSchema>;
-export type ResendVerificationEmailSchemaType = z.infer<
-  typeof resendVerificationEmailSchema
->;
+export type SingUpSchemaType = z.infer<typeof singUpSchema>;

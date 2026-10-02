@@ -6,6 +6,7 @@ import HTTPError from "@/errors/http-error.js";
 import {
   sendVerificationEmail,
   sendWelcomeEmail,
+  sendResetPasswordEmail,
 } from "@/modules/email/send-email.js";
 import {
   signUpRepository,
@@ -14,6 +15,8 @@ import {
   updateVerificationStatus,
   deleteVerificationToken,
   findUserToResendEmail,
+  getUserByEmail,
+  resetPasswordRepository,
 } from "./auth-repository.js";
 import { createVerificationToken, createJWTToken } from "./auth-utils.js";
 
@@ -61,10 +64,18 @@ export const resendVerificationEmailService = async (email: string) => {
 };
 
 export const loginService = async (data: LoginSchemaType) => {
-  const user = await db.orm.public.User.where({ email: data.email }).first();
+  const user = await getUserByEmail(data.email);
   if (!user) throw new HTTPError("Invalid email or password", 401);
   const isValidPassword = await argon2.verify(user.password, data.password);
   if (!isValidPassword) throw new HTTPError("Invalid email or password", 401);
   const token = createJWTToken(user.id);
   return { response: { ...user, password: undefined }, token };
+};
+
+export const resetPasswordService = async (email: string) => {
+  const user = await getUserByEmail(email);
+  if (!user) throw new HTTPError("User not found", 404);
+  const { verificationToken, hashedToken } = await createVerificationToken();
+  await resetPasswordRepository(user.id, hashedToken);
+  await sendResetPasswordEmail(user.email, verificationToken);
 };
