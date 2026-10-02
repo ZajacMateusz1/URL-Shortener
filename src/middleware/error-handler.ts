@@ -9,7 +9,9 @@ const errorHandler = (
 ) => {
   console.error(err);
   const mappedError = errorMapper(err);
-  res.status(mappedError.statusCode).json({ error: mappedError.message });
+  res
+    .status(mappedError.statusCode)
+    .json({ error: mappedError.message, details: mappedError.details });
 };
 
 export default errorHandler;

@@ -36,8 +36,6 @@ export const deleteVerificationToken = async (userId: number, tx: Tx) => {
   return tx.orm.public.UserVerification.where({ userId }).delete();
 };
 
-export const resendVerificationEmailRepository = async (email: string) => {};
-
 export const findUserToResendEmail = async (email: string) => {
   return db.orm.public.User.select("id", "email")
     .where({ email, isVerified: false })
