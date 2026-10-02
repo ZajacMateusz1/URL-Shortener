@@ -51,10 +51,29 @@ export const getUserByEmail = async (email: string) => {
 export const resetPasswordRepository = async (
   userId: number,
   hashedToken: string,
+  tx: Tx,
 ) => {
-  return db.orm.public.PasswordReset.create({
+  return tx.orm.public.PasswordReset.create({
     userId,
     tokenHash: hashedToken,
     expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
   });
+};
+
+export const findPasswordResetToken = async (hashedToken: string) => {
+  return db.orm.public.PasswordReset.where({ tokenHash: hashedToken }).first();
+};
+
+export const updateUserPassword = async (
+  userId: number,
+  newPassword: string,
+  tx: Tx,
+) => {
+  return tx.orm.public.User.where({ id: userId }).update({
+    password: newPassword,
+  });
+};
+
+export const deletePasswordResetToken = async (userId: number, tx: Tx) => {
+  return tx.orm.public.PasswordReset.where({ userId }).delete();
 };

@@ -17,6 +17,9 @@ import {
   findUserToResendEmail,
   getUserByEmail,
   resetPasswordRepository,
+  findPasswordResetToken,
+  updateUserPassword,
+  deletePasswordResetToken,
 } from "./auth-repository.js";
 import { createVerificationToken, createJWTToken } from "./auth-utils.js";
 
@@ -76,6 +79,26 @@ export const resetPasswordService = async (email: string) => {
   const user = await getUserByEmail(email);
   if (!user) throw new HTTPError("User not found", 404);
   const { verificationToken, hashedToken } = await createVerificationToken();
-  await resetPasswordRepository(user.id, hashedToken);
+  await db.transaction(async (tx) => {
+    await deletePasswordResetToken(user.id, tx);
+    await resetPasswordRepository(user.id, hashedToken, tx);
+  });
   await sendResetPasswordEmail(user.email, verificationToken);
+  return verificationToken;
+};
+
+export const changePasswordService = async (
+  token: string,
+  password: string,
+) => {
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+  const verificationRecord = await findPasswordResetToken(hashedToken);
+  if (verificationRecord === null) throw new HTTPError("Token not found", 404);
+  if (verificationRecord.expiresAt < new Date().toISOString())
+    throw new HTTPError("Token expired", 400);
+  const hashedPassword = await argon2.hash(password);
+  await db.transaction(async (tx) => {
+    await updateUserPassword(verificationRecord.userId, hashedPassword, tx);
+    await deletePasswordResetToken(verificationRecord.userId, tx);
+  });
 };

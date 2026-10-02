@@ -6,6 +6,7 @@ import {
   verifyEmailService,
   loginService,
   resetPasswordService,
+  changePasswordService,
 } from "./auth-service.js";
 import HttpError from "@/errors/http-error.js";
 
@@ -13,6 +14,7 @@ import type {
   SingUpSchemaType,
   EmailSchemaType,
   LoginSchemaType,
+  PasswordSchemaType,
 } from "./auth-schema.js";
 
 export const singup = async (
@@ -102,8 +104,29 @@ export const resetPassword = async (
 ) => {
   try {
     const { email }: EmailSchemaType = req.body;
-    await resetPasswordService(email);
-    res.json({ message: "Password reset email sent successfully" });
+    const result = await resetPasswordService(email);
+    res.json({
+      message: "Password reset email sent successfully",
+      token: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const changePassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { token } = req.params;
+    const { password }: PasswordSchemaType = req.body;
+    if (typeof token !== "string") {
+      throw new HttpError("Invalid token", 400);
+    }
+    await changePasswordService(token, password);
+    res.json({ message: "Password changed successfully" });
   } catch (error) {
     next(error);
   }

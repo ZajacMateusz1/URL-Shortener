@@ -6,9 +6,15 @@ import {
   login,
   logout,
   resetPassword,
+  changePassword,
 } from "./auth-controller.js";
 import validate from "@/middleware/validate.js";
-import { singUpSchema, emailSchema, loginSchema } from "./auth-schema.js";
+import {
+  singUpSchema,
+  emailSchema,
+  loginSchema,
+  passwordSchema,
+} from "./auth-schema.js";
 
 const authRouter = Router();
 
@@ -22,5 +28,10 @@ authRouter.post(
 authRouter.post("/login", validate(loginSchema), login);
 authRouter.post("/logout", logout);
 authRouter.post("/reset-password", validate(emailSchema), resetPassword);
+authRouter.post(
+  "/reset-password/:token",
+  validate(passwordSchema),
+  changePassword,
+);
 
 export default authRouter;

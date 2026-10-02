@@ -4,7 +4,7 @@ export const emailSchema = z.object({
   email: z.email("Incorrect email format"),
 });
 
-export const loginSchema = emailSchema.extend({
+export const passwordSchema = z.object({
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")
@@ -14,6 +14,8 @@ export const loginSchema = emailSchema.extend({
     .regex(/[^A-Za-z0-9]/, "Password must contain a special character"),
 });
 
+export const loginSchema = emailSchema.extend(passwordSchema.shape);
+
 export const singUpSchema = loginSchema.extend({
   username: z
     .string()
@@ -22,5 +24,6 @@ export const singUpSchema = loginSchema.extend({
 });
 
 export type EmailSchemaType = z.infer<typeof emailSchema>;
+export type PasswordSchemaType = z.infer<typeof passwordSchema>;
 export type LoginSchemaType = z.infer<typeof loginSchema>;
 export type SingUpSchemaType = z.infer<typeof singUpSchema>;
