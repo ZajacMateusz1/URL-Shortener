@@ -1,4 +1,4 @@
-import { env } from "@/config/env";
+import { env } from "@/config/env.js";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 
@@ -14,7 +14,7 @@ export const createVerificationToken = async () => {
 };
 
 export const createJWTToken = (userId: number) => {
-  return jwt.sign({ id: userId }, env.JWT_SECRET, {
+  return jwt.sign({ sub: userId }, env.JWT_SECRET, {
     expiresIn: "7d",
   });
 };
