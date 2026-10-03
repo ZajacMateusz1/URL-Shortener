@@ -15,8 +15,9 @@ export const shortenUrl = async (
 ) => {
   try {
     const { originalUrl }: ShortenUrlSchemaType = req.body;
-    const response = await shortenUrlService(originalUrl);
-    res.sendStatus(201).json(response);
+    const { sub } = req.userData!;
+    const response = await shortenUrlService(originalUrl, sub);
+    res.status(201).json(response);
   } catch (error) {
     next(error);
   }

@@ -1,5 +1,16 @@
 import { db } from "@/prisma/db.js";
 
-export const shortenUrlRepository = async (originalUrl: string) => {};
+export const shortenUrlRepository = (
+  originalUrl: string,
+  shortUrl: string,
+  userId: number,
+) => {
+  return db.orm.public.Link.create({
+    shortUrl,
+    longUrl: originalUrl,
+    ownerId: userId,
+    expiresAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+  });
+};
 
-export const redirectToOriginalUrlRepository = async (shortUrl: string) => {};
+export const redirectToOriginalUrlRepository = (shortUrl: string) => {};
