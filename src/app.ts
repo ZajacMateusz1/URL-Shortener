@@ -1,4 +1,5 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 import errorHandler from "@/middleware/error-handler.js";
 import HttpError from "@/errors/http-error.js";
 
@@ -8,6 +9,7 @@ import urlRouter from "@/modules/url/url-routes.js";
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });

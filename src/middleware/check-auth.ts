@@ -7,7 +7,7 @@ import HttpError from "@/errors/http-error.js";
 import type { UserDataType } from "@/types/index.js";
 
 export const checkAuth = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers.authorization?.split(" ")[1];
+  const token = req.cookies.token;
   if (!token) {
     throw new HttpError("Unauthorized", 401);
   }
