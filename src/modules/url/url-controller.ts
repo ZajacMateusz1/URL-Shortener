@@ -33,6 +33,8 @@ export const redirectToOriginalUrl = async (
     if (typeof shortUrl !== "string") {
       throw new HttpError("Invalid short URL", 400);
     }
+    const response = await redirectToOriginalUrlService(shortUrl);
+    res.status(302).redirect(response);
   } catch (error) {
     next(error);
   }

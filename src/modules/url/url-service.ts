@@ -28,4 +28,10 @@ export const shortenUrlService = async (
   );
 };
 
-export const redirectToOriginalUrlService = async (shortUrl: string) => {};
+export const redirectToOriginalUrlService = async (shortUrl: string) => {
+  const originalUrl = await redirectToOriginalUrlRepository(shortUrl);
+  if (!originalUrl) {
+    throw new HttpError("Short URL not found", 404);
+  }
+  return originalUrl.longUrl;
+};
