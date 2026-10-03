@@ -14,5 +14,7 @@ export const shortenUrlRepository = (
 };
 
 export const redirectToOriginalUrlRepository = (shortUrl: string) => {
-  return db.orm.public.Link.select("longUrl").where({ shortUrl }).first();
+  return db.orm.public.Link.select("longUrl", "expiresAt")
+    .where({ shortUrl })
+    .first();
 };

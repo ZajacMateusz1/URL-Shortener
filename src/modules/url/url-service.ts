@@ -33,5 +33,8 @@ export const redirectToOriginalUrlService = async (shortUrl: string) => {
   if (!originalUrl) {
     throw new HttpError("Short URL not found", 404);
   }
+  if (new Date(originalUrl.expiresAt).getTime() < Date.now()) {
+    throw new HttpError("Short URL has expired", 410);
+  }
   return originalUrl.longUrl;
 };
