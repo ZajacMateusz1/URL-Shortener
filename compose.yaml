@@ -14,6 +14,17 @@ services:
       retries: 5
     ports:
       - "5433:5432"
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   backend:
     build: .
     environment:
@@ -21,10 +32,14 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - RESEND_API_KEY=${RESEND_API_KEY}
       - BASE_URL=${BASE_URL}
+      - REDIS_URL=${REDIS_URL}
     depends_on:
       db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     ports:
       - "5000:5000"
 volumes:
   pgdata:
+  redis_data:
