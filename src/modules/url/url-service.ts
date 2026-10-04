@@ -30,7 +30,12 @@ export const shortenUrlService = async (
 };
 
 export const redirectToOriginalUrlService = async (shortUrl: string) => {
-  const cachedUrl = await redisClient.get(shortUrl);
+  let cachedUrl: string | null = null;
+  try {
+    cachedUrl = await redisClient.get(shortUrl);
+  } catch (error) {
+    console.error("Redis error:", error);
+  }
   if (cachedUrl !== null) {
     return cachedUrl;
   }
