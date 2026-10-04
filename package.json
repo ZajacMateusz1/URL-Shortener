@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest",
     "build": "tsc",
     "start": "node dist/server.js",
     "dev": "tsx watch src/server.ts",
@@ -23,7 +23,8 @@
     "@types/node": "^26.6.3",
     "prisma": "^8.0.0-rc.19",
     "tsx": "^4.23.15",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3"
   },
   "dependencies": {
     "@prisma/orm-postgres": "^8.0.0-rc.13",
