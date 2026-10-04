@@ -1,3 +1,4 @@
+import redisClient from "@/config/redis.js";
 import HttpError from "@/errors/http-error.js";
 
 import {
@@ -29,12 +30,20 @@ export const shortenUrlService = async (
 };
 
 export const redirectToOriginalUrlService = async (shortUrl: string) => {
+  const cachedUrl = await redisClient.get(shortUrl);
+  if (cachedUrl !== null) {
+    return cachedUrl;
+  }
   const originalUrl = await redirectToOriginalUrlRepository(shortUrl);
   if (!originalUrl) {
     throw new HttpError("Short URL not found", 404);
   }
-  if (new Date(originalUrl.expiresAt).getTime() < Date.now()) {
+  const expiresAt = new Date(originalUrl.expiresAt).getTime();
+  const now = Date.now();
+  if (expiresAt < now) {
     throw new HttpError("Short URL has expired", 410);
   }
+  const expirationTime = Math.max(1, Math.floor((expiresAt - now) / 1000));
+  await redisClient.set(shortUrl, originalUrl.longUrl, { EX: expirationTime });
   return originalUrl.longUrl;
 };
