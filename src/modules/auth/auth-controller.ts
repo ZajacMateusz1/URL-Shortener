@@ -1,4 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
+import { env } from "@/config/env.js";
 
 import {
   resendVerificationEmailService,
@@ -27,7 +28,7 @@ export const signup = async (
     const { response, token } = await singUpService(data);
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
+      secure: env.ENVIRONMENT === "production",
       sameSite: "strict",
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
@@ -81,7 +82,7 @@ export const login = async (
     const { response, token } = await loginService(loginData);
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
+      secure: env.ENVIRONMENT === "production",
       sameSite: "strict",
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
