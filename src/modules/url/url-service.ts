@@ -49,6 +49,12 @@ export const redirectToOriginalUrlService = async (shortUrl: string) => {
     throw new HttpError("Short URL has expired", 410);
   }
   const expirationTime = Math.max(1, Math.floor((expiresAt - now) / 1000));
-  await redisClient.set(shortUrl, originalUrl.longUrl, { EX: expirationTime });
+  try {
+    await redisClient.set(shortUrl, originalUrl.longUrl, {
+      EX: expirationTime,
+    });
+  } catch (error) {
+    console.error("Redis error:", error);
+  }
   return originalUrl.longUrl;
 };
