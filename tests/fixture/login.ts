@@ -7,7 +7,7 @@ export const createTestUser = async (userData: {
   username: string;
 }) => {
   const hashedPassword = await argon2.hash(userData.password);
-  return await db.orm.public.User.create({
+  return db.orm.public.User.create({
     ...userData,
     password: hashedPassword,
     isVerified: false,

@@ -8,5 +8,6 @@ export default defineConfig({
     globals: true,
     environment: "node",
     setupFiles: ["./tests/setup"],
+    fileParallelism: false,
   },
 });
