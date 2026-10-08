@@ -25,7 +25,7 @@ export const sendVerificationEmail = async (
   recipient: string,
   token: string,
 ) => {
-  const verificationLink = `${env.BASE_URL}/api/auth/verify-email/${token}`;
+  const verificationLink = `${env.APP_BASE_URL}/api/auth/verify-email/${token}`;
   await resend.emails.send({
     from: "onboarding@resend.dev",
     to: recipient,
@@ -41,7 +41,7 @@ export const sendResetPasswordEmail = async (
   recipient: string,
   token: string,
 ) => {
-  const verificationLink = `${env.BASE_URL}/api/auth/reset-password/${token}`;
+  const verificationLink = `${env.APP_BASE_URL}/api/auth/reset-password/${token}`;
   await resend.emails.send({
     from: "onboarding@resend.dev",
     to: recipient,

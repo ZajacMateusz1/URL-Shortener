@@ -14,6 +14,21 @@ services:
       retries: 5
     ports:
       - "5433:5432"
+  db-test:
+    image: postgres:18
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME_TEST}
+    volumes:
+      - pgdata_test:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME_TEST}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5434:5432"
   redis:
     image: redis:7-alpine
     ports:
@@ -31,8 +46,9 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - JWT_SECRET=${JWT_SECRET}
       - RESEND_API_KEY=${RESEND_API_KEY}
-      - BASE_URL=${BASE_URL}
+      - APP_BASE_URL=${APP_BASE_URL}
       - REDIS_URL=${REDIS_URL}
+      - ENVIRONMENT=${ENVIRONMENT}
     depends_on:
       db:
         condition: service_healthy
@@ -43,3 +59,4 @@ services:
 volumes:
   pgdata:
   redis_data:
+  pgdata_test:
