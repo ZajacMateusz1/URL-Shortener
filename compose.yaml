@@ -48,6 +48,7 @@ services:
       - RESEND_API_KEY=${RESEND_API_KEY}
       - APP_BASE_URL=${APP_BASE_URL}
       - REDIS_URL=${REDIS_URL}
+      - ENVIRONMENT=${ENVIRONMENT}
     depends_on:
       db:
         condition: service_healthy
