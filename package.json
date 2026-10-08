@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "dotenv run -f .env.test -- vitest",
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "start": "node dist/server.js",
     "dev": "tsx watch src/server.ts",
     "postinstall": "prisma skills sync || exit 0",
@@ -24,6 +24,7 @@
     "@types/supertest": "^7.2.1",
     "prisma": "^8.0.0-rc.19",
     "supertest": "^7.3.1",
+    "tsc-alias": "^1.9.7",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vitest": "^5.0.3"
