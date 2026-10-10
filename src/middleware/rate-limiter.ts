@@ -8,9 +8,9 @@ export const fixedWindow =
     try {
       const ip = req.ip;
       if (!ip) throw new HTTPError("Unable to determine client IP", 400);
-      const key = `rate-limit:${ip}`;
+      const key = `rate-limit-window:${ip}`;
       const curr = await redisClient.incr(key);
-      if (curr === 1) redisClient.expire(key, expireTime);
+      if (curr === 1) await redisClient.expire(key, expireTime);
       if (curr > limit) throw new HTTPError("Too many requests", 429);
       next();
     } catch (error) {
@@ -24,7 +24,7 @@ export const tokenBucket =
     try {
       const ip = req.ip;
       if (!ip) throw new HTTPError("Unable to determine client IP", 400);
-      const key = `rate-limit:${ip}`;
+      const key = `rate-limit-bucket:${ip}`;
       const now = Date.now();
       let curr = await redisClient.hGetAll(key);
       if (Object.keys(curr).length === 0) {
@@ -45,6 +45,7 @@ export const tokenBucket =
           tokens: newTokens - 1,
         });
       }
+      await redisClient.expire(key, Math.ceil(bucketCapacity / refillRate));
       next();
     } catch (error) {
       next(error);
