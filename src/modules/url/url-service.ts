@@ -51,7 +51,7 @@ export const redirectToOriginalUrlService = async (shortUrl: string) => {
   const expirationTime = Math.max(1, Math.floor((expiresAt - now) / 1000));
   try {
     await redisClient.set(shortUrl, originalUrl.longUrl, {
-      EX: expirationTime,
+      expiration: { type: "EX", value: expirationTime },
     });
   } catch (error) {
     console.error("Redis error:", error);
