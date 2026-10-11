@@ -7,7 +7,7 @@ import { tokenBucket } from "../../src/middleware/rate-limiter";
 describe("Toen bucket rate-limiter", () => {
   const endpoint = "/test";
   const app = express();
-  app.get(endpoint, tokenBucket(2, 0.1), (req, res) =>
+  app.get(endpoint, tokenBucket(2, 0.1, "test"), (req, res) =>
     res.json({ status: "ok" }),
   );
 

@@ -19,12 +19,12 @@ export const fixedWindow =
   };
 
 export const tokenBucket =
-  (bucketCapacity: number, refillRate: number) =>
+  (bucketCapacity: number, refillRate: number, limiterName: string) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const ip = req.ip;
       if (!ip) throw new HTTPError("Unable to determine client IP", 400);
-      const key = `rate-limit-bucket:${ip}`;
+      const key = `rate-limit-bucket:${limiterName}:${ip}`;
       const now = Date.now();
       let curr = await redisClient.hGetAll(key);
       if (Object.keys(curr).length === 0) {
