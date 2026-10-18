@@ -60,6 +60,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Make db migrations
-        run: npm run migrate npx prisma db migrate --advance-ref db-test
+        run: npx prisma db migrate --advance-ref db-test
       - name: Run verification
         run: npm run verify
