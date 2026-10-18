@@ -1,7 +1,7 @@
 # URL Shortener
 
 A TypeScript URL-shortening API built with Express, PostgreSQL, Redis, JWT
-authentication, and Prisma ORM Postgres.
+authentication, and Prisma ORM for PostgreSQL.
 
 ## Features
 
@@ -23,7 +23,8 @@ authentication, and Prisma ORM Postgres.
 - npm
 
 Docker users can start PostgreSQL, Redis, and the backend with the included
-[`compose.yaml`](./compose.yaml).
+[`compose.yaml`](./compose.yaml). The Compose configuration expects a `.env`
+file in the project root.
 
 ## Installation
 
@@ -38,7 +39,7 @@ cp .env.example .env
 ```
 
 Then replace every placeholder in `.env`. The application validates all
-required variables when it starts.
+required variables when its configuration is loaded.
 
 ### Environment variables
 
@@ -53,9 +54,26 @@ required variables when it starts.
 | `DB_USER`        | PostgreSQL user used by Docker Compose           |
 | `DB_PASSWORD`    | PostgreSQL password used by Docker Compose       |
 | `DB_NAME`        | Development database name used by Docker Compose |
+| `DB_NAME_TEST`   | Test database name used by Docker Compose        |
+
+For local development with the application running directly on your host,
+the database and Redis URLs should use host ports, for example:
+
+```env
+DATABASE_URL="postgresql://postgres:password@localhost:5433/mydb"
+REDIS_URL="redis://localhost:6379"
+```
+
+When the backend runs inside Docker Compose, use service names instead:
+
+```env
+DATABASE_URL="postgresql://postgres:password@db:5432/mydb"
+REDIS_URL="redis://redis:6379"
+```
 
 For tests, use the separate [`.env.test`](./.env.test) configuration. It
-points to the test database and Redis database.
+points to the test database and Redis database. The test database is exposed
+on host port `5434`.
 
 ## Database and Prisma
 
@@ -71,7 +89,15 @@ npm run contract:emit
 
 Database migrations are stored in [`migrations/app`](./migrations/app). Make
 sure PostgreSQL is running and `DATABASE_URL` points to the intended database
-before applying or creating migrations.
+before applying migrations. Apply the existing migrations with:
+
+```bash
+dotenv run -f .env -- sh -c 'npx prisma db migrate --db "$DATABASE_URL" --advance-ref db'
+```
+
+Use `--advance-ref db-test` with the test database. The exact migration command
+may vary with the Prisma CLI version; see [`prisma-8.md`](./prisma-8.md) for
+the project-specific Prisma 8 workflow.
 
 ## Running locally
 
@@ -98,11 +124,21 @@ npm start
 
 ## Docker Compose
 
-Start the development stack:
+Create `.env` first and use container service names in `DATABASE_URL` and
+`REDIS_URL`, as described above. Then start the development stack:
 
 ```bash
 docker compose up --build
 ```
+
+On a fresh database, apply migrations from the host after the database service
+is healthy:
+
+```bash
+dotenv run -f .env -- sh -c 'npx prisma db migrate --db "$DATABASE_URL" --advance-ref db'
+```
+
+The backend image does not apply migrations automatically during startup.
 
 The services use these host ports:
 
@@ -150,9 +186,14 @@ Returns:
 | `POST` | `/api/auth/reset-password`        | Send a password-reset email               |
 | `POST` | `/api/auth/reset-password/:token` | Set a new password using a reset token    |
 
-Signup and login expect an email, password, and username where applicable.
-Passwords must be 8–64 characters and contain an uppercase letter, a number,
-and a special character.
+Signup expects an email, password, and username. Login expects an email and
+password. Passwords must be 8–64 characters and contain an uppercase letter,
+a number, and a special character.
+
+Signup and login set the `token` value in an HTTP-only cookie. The token is not
+returned in the JSON response. Email verification is supported, but the
+current authentication flow does not block login or URL creation for users who
+have not verified their email address.
 
 ### URL shortening
 
@@ -167,6 +208,17 @@ Content-Type: application/json
 }
 ```
 
+Successful responses contain the generated short URL and expiration time:
+
+```json
+{
+  "shortUrl": "abc123",
+  "longUrl": "https://example.com",
+  "ownerId": 1,
+  "expiresAt": "2026-11-01T12:00:00.000Z"
+}
+```
+
 Redirect to the original URL:
 
 ```http
@@ -174,11 +226,23 @@ GET /api/urls/:shortUrl
 ```
 
 Short URLs expire 14 days after creation. Expired links return HTTP `410`.
+Redirects are cached in Redis. URL creation and redirects are rate-limited per
+client IP.
 
 ## Testing
 
 Tests require the test PostgreSQL and Redis services configured in
-[`.env.test`](./.env.test).
+[`.env.test`](./.env.test). Start the required services with:
+
+```bash
+docker compose up -d db-test redis
+```
+
+Apply the migrations to the test database before the first test run:
+
+```bash
+dotenv run -f .env.test -- sh -c 'npx prisma db migrate --db "$DATABASE_URL" --advance-ref db-test'
+```
 
 Run the complete test suite once:
 
@@ -193,7 +257,7 @@ npm test
 ```
 
 The current test suite covers signup, login, authentication, URL shortening,
-redirects, and basic validation.
+redirects, rate limiting, and basic validation.
 
 ## Project structure
 
@@ -211,6 +275,7 @@ src/
 ├── app.ts           Express application
 └── server.ts        Server startup
 tests/               Integration tests and fixtures
+migrations/          Prisma database migrations and snapshots
 ```
 
 ## Error responses
